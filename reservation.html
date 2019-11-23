@@ -40,23 +40,15 @@
                           </div>
                         <br>
                         <div class="form-group">
-                            <label for="exampleFormControlTextarea2">What time would you like to Reserve?</label>
-                            <textarea class="form-control" id="reservation-time" rows="1"></textarea>
+                            <label for="exampleFormControlTextarea2">What is your phone number?</label>
+                            <textarea class="form-control" id="reservation-phone" rows="1"></textarea>
                           </div>
                         <br>
                         <div class="form-group">
-                            <label for="exampleFormControlSelect3">How many people are in your party?</label>
-                            <select class="form-control" id="reservation-size">
-                              <option>1</option>
-                              <option>2</option>
-                              <option>3</option>
-                              <option>4</option>
-                              <option>5</option>
-                              <option>6</option>
-                              <option>7</option>
-                              <option>8</option>
-                            </select>
+                            <label for="exampleFormControlTextarea4">What is your email address?</label>
+                            <textarea class="form-control" id="reservation-email" rows="1"></textarea>
                           </div>
+                        <br>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea4">ID</label>
@@ -74,7 +66,43 @@
         </div>
     </div>
 
+    <script type="text/javascript">
+        $("#register-btn").on("click", function (event) {
+            event.preventDefault();
+            var newReservation = {
+                name: $("#reservation-name").val(),
+                phone: $("#reservation-phone").val(),
+                email: $("#reservation-email").val(),
+                id: $("reservation-id").val(),
+            };
+            $.get("/api/tables", function (data) {
+                if (data) {
+                    if (data.length > 5) {
+                        waitlist(newReservation);
+                    }
+                    else {
+                        newRez(newReservation);
+                    }
+                }
+            })
+        });
 
+        function waitlist(newReservation) {
+            $.post("/api/waitlist", newReservation)
+                .then(function (data) {
+                    console.log("add.html", data);
+                    alert("Adding table to waitlist...");
+                });
+        }
+        function newRez(newReservation) {
+            $.post("/api/tables", newReservation)
+                .then(function (data) {
+                    console.log("add.html", data);
+                    alert("Adding table to tables...");
+                });
+        }
+
+      </script>
 
 </body>
 

@@ -18,8 +18,8 @@ var waitlist = [];
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
-app.get("/add", function(req, res) {
-  res.sendFile(path.join(__dirname, "add.html"));
+app.get("/reservation", function(req, res) {
+  res.sendFile(path.join(__dirname, "reservation.html"));
 });
 app.get("/view", function(req, res) {
     res.sendFile(path.join(__dirname, "view.html"));
@@ -33,17 +33,26 @@ app.get("/api/waitlist", function(req, res) {
     return res.json(waitlist);
 })
 // Create New Characters - takes in JSON input
-app.post("/add", function(req, res) {
+app.post("/api/tables", function(req, res) {
   // req.body hosts is equal to the JSON post sent from the user
   // This works because of our body parsing middleware
   var newReservation = req.body;
   // Using a RegEx Pattern to remove spaces from newCharacter
   // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-  newCharacter.routeName = newCharacter.name.replace(/\s+/g, "").toLowerCase();
-  console.log(newCharacter);
-  characters.push(newCharacter);
-  res.json(newCharacter);
+  //newCharacter.routeName = newCharacter.name.replace(/\s+/g, "").toLowerCase();
+  console.log(newReservation);
+  reservations.push(newReservation);
+  res.json(newReservation);
 });
+
+app.post("/api/waitlist", function (req, res) {
+  var newReservation = req.body;
+  console.log(newReservation);
+  console.log(waitlist);
+  waitlist.push(newReservation);
+  res.json(newReservation);
+});
+
 // Starts the server to begin listening
 // =============================================================
 app.listen(PORT, function() {
