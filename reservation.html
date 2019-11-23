@@ -1,31 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Hot Restaurant</title>
     <!-- Latest compiled and minified CSS & JS -->
-    <link rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
 
-        <div class="container">
-                <div class="jumbotron">
-                  <h1>Hot Restaurant</h1>
-                  <h3>Make a Reservation</h3>
-                  <hr>
-                  
-                  <a href="/view"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> View Tables</button></a>
-                  <a href="/"><button class="btn btn-danger btn-lg"><span
-                        class="fa fa-home"></span> Home page</button></a>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Hot Restaurant</h1>
+            <hr>
+            <a href="/view"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> View
+                    Tables</button></a>
+            <a href="/"><button class="btn btn-danger btn-lg"><span class="fa fa-home"></span> Home page</button></a>
+        </div>
+
+        <div class="row">
+
+            <div class="col-12">
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3><strong>Make a Reservation:</strong></h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">Whose name is this registered under?</label>
+                            <textarea class="form-control" id="reservation-name" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea2">What time would you like to Reserve?</label>
+                            <textarea class="form-control" id="reservation-time" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect3">How many people are in your party?</label>
+                            <select class="form-control" id="reservation-size">
+                              <option>1</option>
+                              <option>2</option>
+                              <option>3</option>
+                              <option>4</option>
+                              <option>5</option>
+                              <option>6</option>
+                              <option>7</option>
+                              <option>8</option>
+                            </select>
+                          </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea4">ID</label>
+                            <textarea class="form-control" id="reservation-id" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary btn-md" id="register-btn">Submit</button>
+
+                        </div>
+                    </div>
                 </div>
-    
+
+            </div>
+        </div>
+    </div>
+
+
+
 </body>
+
 </html>
