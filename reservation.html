@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hot Restaurant</title>
+    <!-- Latest compiled and minified CSS & JS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Hot Restaurant</h1>
+            <hr>
+            <a href="/view"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> View
+                    Tables</button></a>
+            <a href="/"><button class="btn btn-danger btn-lg"><span class="fa fa-home"></span> Home page</button></a>
+        </div>
+
+        <div class="row">
+
+            <div class="col-12">
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3><strong>Make a Reservation:</strong></h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">Whose name is this registered under?</label>
+                            <textarea class="form-control" id="reservation-name" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea2">What is your phone number?</label>
+                            <textarea class="form-control" id="reservation-phone" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea4">What is your email address?</label>
+                            <textarea class="form-control" id="reservation-email" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea4">ID</label>
+                            <textarea class="form-control" id="reservation-id" rows="1"></textarea>
+                          </div>
+                        <br>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary btn-md" id="register-btn">Submit</button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $("#register-btn").on("click", function (event) {
+            event.preventDefault();
+            var newReservation = {
+                name: $("#reservation-name").val(),
+                phone: $("#reservation-phone").val(),
+                email: $("#reservation-email").val(),
+                id: $("reservation-id").val(),
+            };
+            $.get("/api/tables", function (data) {
+                if (data) {
+                    if (data.length > 5) {
+                        waitlist(newReservation);
+                    }
+                    else {
+                        newRez(newReservation);
+                    }
+                }
+            })
+        });
+
+        function waitlist(newReservation) {
+            $.post("/api/waitlist", newReservation)
+                .then(function (data) {
+                    console.log("add.html", data);
+                    alert("Adding table to waitlist...");
+                });
+        }
+        function newRez(newReservation) {
+            $.post("/api/tables", newReservation)
+                .then(function (data) {
+                    console.log("add.html", data);
+                    alert("Adding table to tables...");
+                });
+        }
+
+      </script>
+
+</body>
+
+</html>
