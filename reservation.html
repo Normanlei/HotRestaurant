@@ -19,7 +19,7 @@
         <div class="jumbotron">
             <h1>Hot Restaurant</h1>
             <hr>
-            <a href="/view"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> View
+            <a href="/view"><button class="btn btn-danger btn-lg"> <span class="fa fa-eye"></span>View
                     Tables</button></a>
             <a href="/"><button class="btn btn-danger btn-lg"><span class="fa fa-home"></span> Home page</button></a>
         </div>
@@ -91,6 +91,11 @@
                         id: $("#reservation-id").val(),
                         pin: $("#reservation-pin").val(),
                     };
+                    $("#reservation-name").val('');
+                    $("#reservation-phone").val('');
+                    $("#reservation-email").val('');
+                    $("#reservation-id").val('');
+                    $("#reservation-pin").val('');
                     $.get("/api/reservations", function (data) {
                         if (data) {
                             if (data.length >= 5) {

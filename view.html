@@ -11,7 +11,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="./generateList.js"></script>
 </head>
 
 <body>
@@ -103,9 +102,9 @@
         </div>
 
         <script type="text/javascript">
-            function editRez(password, modalID) {
-                let userInputPass = $("#pin").val().trim();
-                if (userInputPass === password) $('#' + modalID).modal('toggle');
+            function editRez(password, modalID,uniId) {
+                let userInputPass = $(`#${uniId}`).val();
+                if (userInputPass == password) $('#' + modalID).modal('toggle');
                 else alert("Please enter a valid password!!!");
             }
             function saveModalFunction(num, list, newObj) {
@@ -143,8 +142,8 @@
                     }
                 }
             }
-            function myFunction() {
-                var x = document.getElementById("pin");
+            function myFunction(uniId) {
+                var x = document.getElementById(`${uniId}`);
                 if (x.type === "password") {
                     x.type = "text";
                 } else {
@@ -182,25 +181,25 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <h6>Name: <span class="text-info" id="name">${data.name}</span></h6>
-                                <h6>Phone: <span class="text-info" id="phone">${data.phone}</span><span style="float:right"><input
+                                <h6>Name: <span class="text-info" class="name">${data.name}</span></h6>
+                                <h6>Phone: <span class="text-info" class="phone">${data.phone}</span><span style="float:right"><input
                                             type="checkbox" checked>&nbsp;Receive Text</span></h6>
-                                <h6>Email: <span class="text-info" id="email">${data.email}</span><span
+                                <h6>Email: <span class="text-info" class="email">${data.email}</span><span
                                         style="float:right"><input type="checkbox" checked>&nbsp;Receive Email</span>
                                 </h6>
-                                <h6>Party Size: <span class="text-info" id="id">${data.id}</span></h6>
+                                <h6>Party Size: <span class="text-info" class="id">${data.id}</span></h6>
                                 <div class="form-group row">
                                     <div class="col-8 form-inline row">
-                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="pin" type="password" placeholder="Enter PIN for Editing">
+                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="${data.phone}pin" type="password" placeholder="Enter PIN for Editing">
                                     </div>
                                     <div class="col-4">
-                                        <input type="checkbox" onclick="myFunction()">&nbsp;Show Password
+                                        <input type="checkbox" onclick=myFunction('${data.phone}pin')>&nbsp;Show Password
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=editRez("${data.pin}","list${i + 1}${i + 1}")>Edit</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=editRez("${data.pin}","list${i + 1}${i + 1}","${data.phone}pin")>Edit</button>
                             </div>
                         </div>
                     </div>
@@ -215,14 +214,14 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <h6>Name: <input value="${data.name}" id="editName"></h6>
-                                <h6>Phone: <input value=${data.phone} id="editPhone"></h6>
-                                <h6>Email: <input value=${data.email} id="editEmail"></h6>
-                                <h6>Party Size: <input value=${data.id} id="editID"></h6>
+                                <h6>Name: <input value="${data.name}" id="${list}editName${i+1}"></h6>
+                                <h6>Phone: <input value=${data.phone} id="${list}editPhone${i+1}"></h6>
+                                <h6>Email: <input value=${data.email} id="${list}editEmail${i+1}"></h6>
+                                <h6>Party Size: <input value=${data.id} id="${list}editID${i+1}"></h6>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#editName").val(),editPhone:$("#editPhone").val(),editEmail:$("#editEmail").val(),editID:$("#editID").val()})>Save</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#${list}editName${i+1}").val(),editPhone:$("#${list}editPhone${i+1}").val(),editEmail:$("#${list}editEmail${i+1}").val(),editID:$("#${list}editID${i+1}").val()})>Save</button>
                             </div>
                         </div>
                     </div>
