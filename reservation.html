@@ -35,24 +35,30 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="exampleFormControlTextarea1">Whose name is this registered under?</label>
-                            <textarea class="form-control" id="reservation-name" rows="1"></textarea>
+                            <input class="form-control" id="reservation-name" rows="1"></input>
                         </div>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea2">What is your phone number?</label>
-                            <textarea class="form-control" id="reservation-phone" rows="1"></textarea>
+                            <input class="form-control" id="reservation-phone" rows="1"></input>
                         </div>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea4">What is your email address?</label>
-                            <textarea class="form-control" id="reservation-email" rows="1"></textarea>
+                            <input class="form-control" id="reservation-email" rows="1"></input>
                         </div>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea4">Party Size</label>
-                            <textarea class="form-control" id="reservation-id" rows="1"></textarea>
+                            <input class="form-control" id="reservation-id" rows="1"></input>
                         </div>
                         <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea4">PIN (for editing your reservation with 6 digits maximum)</label>
+                            <input class="form-control" id="reservation-pin" type="password" maxlength="6"></input>
+                            <input type="checkbox" onclick="myFunction()">Show Password
+                        </div>
+
                         <div class="text-right">
                             <button type="submit" class="btn btn-primary btn-md" id="register-btn">Submit</button>
 
@@ -65,18 +71,27 @@
     </div>
 
     <script type="text/javascript">
+        function myFunction() {
+            var x = document.getElementById("reservation-pin");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
         $("#register-btn").on("click", function (event) {
             event.preventDefault();
             var newReservation = {
                 name: $("#reservation-name").val(),
                 phone: $("#reservation-phone").val(),
                 email: $("#reservation-email").val(),
-                id: $("#reservation-id").val()
+                id: $("#reservation-id").val(),
+                pin: $("#reservation-pin").val(),
             };
             console.log(newReservation);
             $.get("/api/reservations", function (data) {
                 if (data) {
-                    if (data.length >=5) {
+                    if (data.length >= 5) {
                         waitlist(newReservation);
                     }
                     else {

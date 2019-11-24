@@ -11,6 +11,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./generateList.js"></script>
 </head>
 
 <body>
@@ -30,7 +31,65 @@
                 <h6><strong>Current Reservations</strong></h6>
             </div>
             <div class="card-body" id="rezstats">
+                <!--sample-->
+                <!-- <li class="list-group-item" data-toggle="modal" data-target="#list1">1. Norman Lei | Party Size: 2</li>
+                <div class="modal" id="list1" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <span class="text-info" id="name">Norman Lei</span></h6>
+                                <h6>Phone: <span class="text-info" id="phone">204</span><span style="float:right"><input
+                                            type="checkbox" checked>&nbsp;Receive Text</span></h6>
+                                <h6>Email: <span class="text-info" id="email">Norman Lei</span><span
+                                        style="float:right"><input type="checkbox" checked>&nbsp;Receive Email</span>
+                                </h6>
+                                <h6>Party Size: <span class="text-info" id="id">2</span></h6>
+                                <div class="form-group row">
+                                    <div class="col-8 form-inline row">
+                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="pin" type="password" placeholder="Enter PIN for Editing">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" onclick="myFunction()">&nbsp;Show Password
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick="editRez('0901','list11')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" id="list11" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant(edit)</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <input value="Norman Lei"></h6>
+                                <h6>Phone: <input value="206"></h6>
+                                <h6>Email: <input value="Norman Lei"></h6>
+                                <h6>Party Size: <input value="2"></h6>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
 
+                <!--sample-->
             </div>
         </div>
         <br>
@@ -44,11 +103,65 @@
         </div>
 
         <script type="text/javascript">
+            function editRez(password, modalID) {
+                let userInputPass = $("#pin").val().trim();
+                if (userInputPass === password) $('#' + modalID).modal('toggle');
+                else alert("Please enter a valid password!!!");
+            }
+            function saveModalFunction(num, list, newObj) {
+                console.log(newObj);
+                if (list === "reservations") {
+                    $.get("/api/reservations", function (data) {
+                        let currObj = data[num];
+                        currObj.name = newObj.editName;
+                        currObj.phone = newObj.editPhone;
+                        currObj.email = newObj.editEmail;
+                        currObj.id = newObj.editID;
+                        console.log(data[num]);
+                        $.get("/api/reservations", function (res) {
+                            console.log(res);
+                            res = data;
+                            console.log(res);
+                            $("#rezstats").empty();
+                                for (var i = 0; i < res.length; i++) {
+                                    let currObj = res[i];
+                                    let currList = generateList(currObj, i, "reservations");
+                                    $("#rezstats").append(currList);
+                                }
+                        });
+                    });
+                } else {
+                    $.get("/api/waitlist", function (data) {
+                        let currObj = data[num];
+                        currObj.name = newObj.editName;
+                        currObj.phone = newObj.editPhone;
+                        currObj.email = newObj.editEmail;
+                        currObj.id = newObj.editID;
+                        $.get("/api/waitlist", function (data) {
+                            if (data.length > 0) {
+                                for (var i = 0; i < data.length; i++) {
+                                    let currObj = data[i];
+                                    let currList = generateList(currObj, i, "waitlist");;
+                                    $("#waitstats").append(currList);
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+            function myFunction() {
+                var x = document.getElementById("pin");
+                if (x.type === "password") {
+                    x.type = "text";
+                } else {
+                    x.type = "password";
+                }
+            }
             $.get("/api/reservations", function (data) {
                 if (data.length > 0) {
                     for (var i = 0; i < data.length; i++) {
                         let currObj = data[i];
-                        let currList = `<li class="list-group-item">${i}. ${currObj.name} | Party Size: ${currObj.id}</li>`;
+                        let currList = generateList(currObj, i, "reservations");
                         $("#rezstats").append(currList);
                     }
                 }
@@ -58,11 +171,70 @@
                 if (data.length > 0) {
                     for (var i = 0; i < data.length; i++) {
                         let currObj = data[i];
-                        let currList = `<li class="list-group-item">${i}. ${currObj.name} | Party Size: ${currObj.id}</li>`;
+                        let currList = generateList(currObj, i, "waitlist");;
                         $("#waitstats").append(currList);
                     }
                 }
             });
+            function generateList(data, i, list) {
+                return `<li class="list-group-item" data-toggle="modal" data-target="#list${i + 1}">${i + 1}. ${data.name} | Party Size: ${data.id}</li>
+                <div class="modal" id="list${i + 1}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <span class="text-info" id="name">${data.name}</span></h6>
+                                <h6>Phone: <span class="text-info" id="phone">${data.phone}</span><span style="float:right"><input
+                                            type="checkbox" checked>&nbsp;Receive Text</span></h6>
+                                <h6>Email: <span class="text-info" id="email">${data.email}</span><span
+                                        style="float:right"><input type="checkbox" checked>&nbsp;Receive Email</span>
+                                </h6>
+                                <h6>Party Size: <span class="text-info" id="id">${data.id}</span></h6>
+                                <div class="form-group row">
+                                    <div class="col-8 form-inline row">
+                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="pin" type="password" placeholder="Enter PIN for Editing">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" onclick="myFunction()">&nbsp;Show Password
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=editRez("${data.pin}","list${i + 1}${i + 1}")>Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" id="list${i + 1}${i + 1}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <input value=${data.name} id="editName"></h6>
+                                <h6>Phone: <input value=${data.phone} id="editPhone"></h6>
+                                <h6>Email: <input value=${data.email} id="editEmail"></h6>
+                                <h6>Party Size: <input value=${data.id} id="editID"></h6>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#editName").val(),editPhone:$("#editPhone").val(),editEmail:$("#editEmail").val(),editID:$("#editID").val()})>Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
         </script>
 
 </body>
