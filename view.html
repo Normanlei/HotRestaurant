@@ -109,7 +109,6 @@
                 else alert("Please enter a valid password!!!");
             }
             function saveModalFunction(num, list, newObj) {
-                console.log(newObj);
                 if (list === "reservations") {
                     $.get("/api/reservations", function (data) {
                         let currObj = data[num];
@@ -117,18 +116,13 @@
                         currObj.phone = newObj.editPhone;
                         currObj.email = newObj.editEmail;
                         currObj.id = newObj.editID;
-                        console.log(data[num]);
-                        $.get("/api/reservations", function (res) {
-                            console.log(res);
-                            res = data;
-                            console.log(res);
-                            $("#rezstats").empty();
-                                for (var i = 0; i < res.length; i++) {
-                                    let currObj = res[i];
-                                    let currList = generateList(currObj, i, "reservations");
-                                    $("#rezstats").append(currList);
-                                }
-                        });
+                        let res = data;
+                        $("#rezstats").empty();
+                        for (var i = 0; i < res.length; i++) {
+                            let currObj = res[i];
+                            let currList = generateList(currObj, i, "reservations");
+                            $("#rezstats").append(currList);
+                        }
                     });
                 } else {
                     $.get("/api/waitlist", function (data) {
@@ -137,15 +131,13 @@
                         currObj.phone = newObj.editPhone;
                         currObj.email = newObj.editEmail;
                         currObj.id = newObj.editID;
-                        $.get("/api/waitlist", function (data) {
-                            if (data.length > 0) {
-                                for (var i = 0; i < data.length; i++) {
-                                    let currObj = data[i];
-                                    let currList = generateList(currObj, i, "waitlist");;
-                                    $("#waitstats").append(currList);
-                                }
-                            }
-                        });
+                        let res = data;
+                        $("#waitstats").empty();
+                        for (var i = 0; i < res.length; i++) {
+                            let currObj = res[i];
+                            let currList = generateList(currObj, i, "waitlist");
+                            $("#waitstats").append(currList);
+                        }
                     });
                 }
             }
@@ -221,7 +213,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <h6>Name: <input value=${data.name} id="editName"></h6>
+                                <h6>Name: <input value="${data.name}" id="editName"></h6>
                                 <h6>Phone: <input value=${data.phone} id="editPhone"></h6>
                                 <h6>Email: <input value=${data.email} id="editEmail"></h6>
                                 <h6>Party Size: <input value=${data.id} id="editID"></h6>

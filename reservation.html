@@ -54,7 +54,8 @@
                         </div>
                         <br>
                         <div class="form-group">
-                            <label for="exampleFormControlTextarea4">PIN (for editing your reservation with 6 digits maximum)</label>
+                            <label for="exampleFormControlTextarea4">PIN (for editing your reservation with 6 digits
+                                maximum)</label>
                             <input class="form-control" id="reservation-pin" type="password" maxlength="6"></input>
                             <input type="checkbox" onclick="myFunction()">Show Password
                         </div>
@@ -80,26 +81,30 @@
             }
         }
         $("#register-btn").on("click", function (event) {
-            event.preventDefault();
-            var newReservation = {
-                name: $("#reservation-name").val(),
-                phone: $("#reservation-phone").val(),
-                email: $("#reservation-email").val(),
-                id: $("#reservation-id").val(),
-                pin: $("#reservation-pin").val(),
-            };
-            console.log(newReservation);
-            $.get("/api/reservations", function (data) {
-                if (data) {
-                    if (data.length >= 5) {
-                        waitlist(newReservation);
-                    }
-                    else {
-                        newRez(newReservation);
-                    }
+            if ($("#reservation-name").val().length > 0 && $("#reservation-phone").val().length > 0 && $("#reservation-email").val().length > 0 && $("#reservation-id").val().length > 0 && $("#reservation-pin").val().length > 0) {
+                if (phonenumber($("#reservation-phone").val()) && validateEmail($("#reservation-email").val()) && validateID($("#reservation-id").val())) {
+                    event.preventDefault();
+                    var newReservation = {
+                        name: $("#reservation-name").val(),
+                        phone: $("#reservation-phone").val(),
+                        email: $("#reservation-email").val(),
+                        id: $("#reservation-id").val(),
+                        pin: $("#reservation-pin").val(),
+                    };
+                    $.get("/api/reservations", function (data) {
+                        if (data) {
+                            if (data.length >= 5) {
+                                waitlist(newReservation);
+                            }
+                            else {
+                                newRez(newReservation);
+                            }
+                        }
+                    })
                 }
-            })
+            } else alert("Please Enter all the information!!!");
         });
+
 
         function waitlist(newReservation) {
             $.post("/api/waitlist", newReservation)
@@ -113,6 +118,37 @@
                     alert("Adding table to reservations");
                 });
         }
+
+        function phonenumber(inputtxt) {
+            var phoneNumberPattern = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+            if (phoneNumberPattern.test(inputtxt)) {
+                return true;
+            }
+            else {
+                alert("Please enter a valid phone number!");
+                return false;
+            }
+        }
+
+        function validateEmail(mail) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (re.test(String(mail).toLowerCase())) return true;
+            else {
+                alert("Please enter a valid email address!")
+                return false;
+            }
+        }
+
+        function validateID(input) {
+            var re = /^\d+$/;
+            if (re.test(input)) return true;
+            else {
+                alert("Please enter a number for party size!")
+                return false;
+            }
+        }
+
+
 
     </script>
 
