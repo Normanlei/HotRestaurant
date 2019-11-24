@@ -109,36 +109,38 @@
                 else alert("Please enter a valid password!!!");
             }
             function saveModalFunction(num, list, newObj) {
-                if (list === "reservations") {
-                    $.get("/api/reservations", function (data) {
-                        let currObj = data[num];
-                        currObj.name = newObj.editName;
-                        currObj.phone = newObj.editPhone;
-                        currObj.email = newObj.editEmail;
-                        currObj.id = newObj.editID;
-                        let res = data;
-                        $("#rezstats").empty();
-                        for (var i = 0; i < res.length; i++) {
-                            let currObj = res[i];
-                            let currList = generateList(currObj, i, "reservations");
-                            $("#rezstats").append(currList);
-                        }
-                    });
-                } else {
-                    $.get("/api/waitlist", function (data) {
-                        let currObj = data[num];
-                        currObj.name = newObj.editName;
-                        currObj.phone = newObj.editPhone;
-                        currObj.email = newObj.editEmail;
-                        currObj.id = newObj.editID;
-                        let res = data;
-                        $("#waitstats").empty();
-                        for (var i = 0; i < res.length; i++) {
-                            let currObj = res[i];
-                            let currList = generateList(currObj, i, "waitlist");
-                            $("#waitstats").append(currList);
-                        }
-                    });
+                if (phonenumber(newObj.editPhone) && validateEmail(newObj.editEmail) && validateID(newObj.editID) && newObj.editName.length > 0) {
+                    if (list === "reservations") {
+                        $.get("/api/reservations", function (data) {
+                            let currObj = data[num];
+                            currObj.name = newObj.editName;
+                            currObj.phone = newObj.editPhone;
+                            currObj.email = newObj.editEmail;
+                            currObj.id = newObj.editID;
+                            let res = data;
+                            $("#rezstats").empty();
+                            for (var i = 0; i < res.length; i++) {
+                                let currObj = res[i];
+                                let currList = generateList(currObj, i, "reservations");
+                                $("#rezstats").append(currList);
+                            }
+                        });
+                    } else {
+                        $.get("/api/waitlist", function (data) {
+                            let currObj = data[num];
+                            currObj.name = newObj.editName;
+                            currObj.phone = newObj.editPhone;
+                            currObj.email = newObj.editEmail;
+                            currObj.id = newObj.editID;
+                            let res = data;
+                            $("#waitstats").empty();
+                            for (var i = 0; i < res.length; i++) {
+                                let currObj = res[i];
+                                let currList = generateList(currObj, i, "waitlist");
+                                $("#waitstats").append(currList);
+                            }
+                        });
+                    }
                 }
             }
             function myFunction() {
@@ -226,6 +228,36 @@
                     </div>
                 </div>`;
             }
+
+            function phonenumber(inputtxt) {
+                var phoneNumberPattern = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+                if (phoneNumberPattern.test(inputtxt)) {
+                    return true;
+                }
+                else {
+                    alert("Please enter a valid phone number!");
+                    return false;
+                }
+            }
+
+            function validateEmail(mail) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (re.test(String(mail).toLowerCase())) return true;
+                else {
+                    alert("Please enter a valid email address!")
+                    return false;
+                }
+            }
+
+            function validateID(input) {
+                var re = /^\d+$/;
+                if (re.test(input)) return true;
+                else {
+                    alert("Please enter a number for party size!")
+                    return false;
+                }
+            }
+
 
         </script>
 
