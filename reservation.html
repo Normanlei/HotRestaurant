@@ -11,7 +11,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
 </head>
 
 <body>
@@ -20,7 +19,7 @@
         <div class="jumbotron">
             <h1>Hot Restaurant</h1>
             <hr>
-            <a href="/view"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> View
+            <a href="/view"><button class="btn btn-danger btn-lg"> <span class="fa fa-eye"></span>View
                     Tables</button></a>
             <a href="/"><button class="btn btn-danger btn-lg"><span class="fa fa-home"></span> Home page</button></a>
         </div>
@@ -36,25 +35,31 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="exampleFormControlTextarea1">Whose name is this registered under?</label>
-                            <textarea class="form-control" id="reservation-name" rows="1"></textarea>
-                          </div>
+                            <input class="form-control" id="reservation-name" rows="1"></input>
+                        </div>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea2">What is your phone number?</label>
-                            <textarea class="form-control" id="reservation-phone" rows="1"></textarea>
-                          </div>
+                            <input class="form-control" id="reservation-phone" rows="1"></input>
+                        </div>
                         <br>
                         <div class="form-group">
                             <label for="exampleFormControlTextarea4">What is your email address?</label>
-                            <textarea class="form-control" id="reservation-email" rows="1"></textarea>
-                          </div>
-                        <br>
+                            <input class="form-control" id="reservation-email" rows="1"></input>
+                        </div>
                         <br>
                         <div class="form-group">
-                            <label for="exampleFormControlTextarea4">ID</label>
-                            <textarea class="form-control" id="reservation-id" rows="1"></textarea>
-                          </div>
+                            <label for="exampleFormControlTextarea4">Party Size</label>
+                            <input class="form-control" id="reservation-id" rows="1"></input>
+                        </div>
                         <br>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea4">PIN (for editing your reservation with 6 digits
+                                maximum)</label>
+                            <input class="form-control" id="reservation-pin" type="password" maxlength="6"></input>
+                            <input type="checkbox" onclick="myFunction()">Show Password
+                        </div>
+
                         <div class="text-right">
                             <button type="submit" class="btn btn-primary btn-md" id="register-btn">Submit</button>
 
@@ -67,42 +72,98 @@
     </div>
 
     <script type="text/javascript">
+        let usedNum = [];
+        function createRandomNum() {
+            let currNum = Math.floor(Math.random() * 999) + 1;
+            while (usedNum.indexOf(currNum) !== -1) createRandomNum();
+            usedNum.push(currNum);
+            return currNum;
+        }
+        function myFunction() {
+            var x = document.getElementById("reservation-pin");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
         $("#register-btn").on("click", function (event) {
-            event.preventDefault();
-            var newReservation = {
-                name: $("#reservation-name").val(),
-                phone: $("#reservation-phone").val(),
-                email: $("#reservation-email").val(),
-                id: $("reservation-id").val(),
-            };
-            $.get("/api/tables", function (data) {
-                if (data) {
-                    if (data.length > 5) {
-                        waitlist(newReservation);
-                    }
-                    else {
-                        newRez(newReservation);
-                    }
+            if ($("#reservation-name").val().length > 0 && $("#reservation-phone").val().length > 0 && $("#reservation-email").val().length > 0 && $("#reservation-id").val().length > 0 && $("#reservation-pin").val().length > 0) {
+                if (phonenumber($("#reservation-phone").val()) && validateEmail($("#reservation-email").val()) && validateID($("#reservation-id").val())) {
+                    event.preventDefault();
+                    var newReservation = {
+                        name: $("#reservation-name").val(),
+                        phone: $("#reservation-phone").val(),
+                        email: $("#reservation-email").val(),
+                        id: $("#reservation-id").val(),
+                        pin: $("#reservation-pin").val(),
+                        code: createRandomNum(),
+                    };
+                    $("#reservation-name").val('');
+                    $("#reservation-phone").val('');
+                    $("#reservation-email").val('');
+                    $("#reservation-id").val('');
+                    $("#reservation-pin").val('');
+                    $.get("/api/reservations", function (data) {
+                        if (data) {
+                            if (data.length >= 5) {
+                                waitlist(newReservation);
+                            }
+                            else {
+                                newRez(newReservation);
+                            }
+                        }
+                    })
                 }
-            })
+            } else alert("Please Enter all the information!!!");
         });
+
 
         function waitlist(newReservation) {
             $.post("/api/waitlist", newReservation)
                 .then(function (data) {
-                    console.log("add.html", data);
-                    alert("Adding table to waitlist...");
+                    alert("Adding table to waitlist");
                 });
         }
         function newRez(newReservation) {
-            $.post("/api/tables", newReservation)
+            $.post("/api/reservations", newReservation)
                 .then(function (data) {
-                    console.log("add.html", data);
-                    alert("Adding table to tables...");
+                    alert("Adding table to reservations");
                 });
         }
 
-      </script>
+        function phonenumber(inputtxt) {
+            var phoneNumberPattern = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+            if (phoneNumberPattern.test(inputtxt)) {
+                return true;
+            }
+            else {
+                alert("Please enter a valid phone number!");
+                return false;
+            }
+        }
+
+        function validateEmail(mail) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (re.test(String(mail).toLowerCase())) return true;
+            else {
+                alert("Please enter a valid email address!")
+                return false;
+            }
+        }
+
+        function validateID(input) {
+            var re = /^\d+$/;
+            if (re.test(input)) return true;
+            else {
+                alert("Please enter a number for party size!")
+                return false;
+            }
+        }
+
+
+
+    </script>
 
 </body>
 

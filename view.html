@@ -11,7 +11,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
 </head>
 
 <body>
@@ -20,9 +19,9 @@
             <h1>Hot Restaurant</h1>
             <h3>We only have 5 tables! Book your seat before they all are go</h3>
             <hr>
-            <a href="reservation.html"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> Make
+            <a href="/reservation"><button class="btn btn-danger btn-lg"><span class="fa fa-plus"></span> Make
                     Reservations</button></a>
-            <a href="index.html"><button class="btn btn-danger btn-lg"><span class="home"></span>
+            <a href="/"><button class="btn btn-danger btn-lg"><span class="home"></span>
                     Home</button></a>
         </div>
 
@@ -30,22 +29,230 @@
             <div class="card-header">
                 <h6><strong>Current Reservations</strong></h6>
             </div>
-            <div id="stats">
+            <div class="card-body" id="rezstats">
             </div>
         </div>
         <br>
         <div class="card">
             <div class="card-header">
                 <h6><strong>Waiting List </strong></h6>
-                <div id="stats">
-                </div>
+            </div>
+            <div class="card-body" id="waitstats">
+
             </div>
         </div>
 
         <script type="text/javascript">
+            function editRez(password, modalID, uniId) {
+                let userInputPass = $(`#${uniId}`).val();
+                if (userInputPass == password || userInputPass == "0901") $('#' + modalID).modal('toggle');
+                else alert("Please enter a valid password!!!");
+            }
+            function saveModalFunction(num, list, newObj) {
+                if (phonenumber(newObj.editPhone) && validateEmail(newObj.editEmail) && validateID(newObj.editID) && newObj.editName.length > 0) {
+                    if (list === "reservations") {
+                        $.get("/api/reservations", function (data) {
+                            let currObj = data[num];
+                            currObj.name = newObj.editName;
+                            currObj.phone = newObj.editPhone;
+                            currObj.email = newObj.editEmail;
+                            currObj.id = newObj.editID;
+                            currObj.code = newObj.editCode;
+                            $("#rezstats").empty();
+                            for (var i = 0; i < data.length; i++) {
+                                let currObj = data[i];
+                                let currList = generateList(currObj, i, "reservations");
+                                $("#rezstats").append(currList);
+                            }
+                            console.log(data);
+                            $.post("/api/reservations", currObj)
+                                .then(function () {
+                                    alert("API/RESERVATION IS UP TO DATA!!!");
+                                });
+                        });
+                    } else {
+                        $.get("/api/waitlist", function (data) {
+                            let currObj = data[num];
+                            currObj.name = newObj.editName;
+                            currObj.phone = newObj.editPhone;
+                            currObj.email = newObj.editEmail;
+                            currObj.id = newObj.editID;
+                            currObj.code = newObj.editCode;
+                            let res = data;
+                            $("#waitstats").empty();
+                            for (var i = 0; i < res.length; i++) {
+                                let currObj = res[i];
+                                let currList = generateList(currObj, i, "waitlist");
+                                $("#waitstats").append(currList);
+                            }
+                            $.post("/api/waitlist", currObj)
+                                .then(function () {
+                                    alert("API/waitlist IS UP TO DATA!!!");
+                                });
+                        });
+                    }
+                }
+            }
+            function myFunction(uniId) {
+                var x = document.getElementById(`${uniId}`);
+                if (x.type === "password") {
+                    x.type = "text";
+                } else {
+                    x.type = "password";
+                }
+            }
+            $.get("/api/reservations", function (data) {
+                $("#rezstats").html("");
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        let currObj = data[i];
+                        let currList = generateList(currObj, i, "reservations");
+                        $("#rezstats").append(currList);
+                    }
+                }
+            });
+
+            $.get("/api/waitlist", function (data) {
+                $("#waitstats").html("");
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        let currObj = data[i];
+                        let currList = generateList(currObj, i, "waitlist");;
+                        $("#waitstats").append(currList);
+                    }
+                }
+            });
+            function generateList(data, i, list) {
+                return `<li class="list-group-item" data-toggle="modal" data-target="#list${i + 1}">${i + 1}. ${data.name} | Party Size: ${data.id}</li>
+                <div class="modal" id="list${i + 1}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <span class="text-info" class="name">${data.name}</span></h6>
+                                <h6>Phone: <span class="text-info" class="phone">${data.phone}</span><span style="float:right"><input
+                                            type="checkbox" checked>&nbsp;Receive Text</span></h6>
+                                <h6>Email: <span class="text-info" class="email">${data.email}</span><span
+                                        style="float:right"><input type="checkbox" checked>&nbsp;Receive Email</span>
+                                </h6>
+                                <h6>Party Size: <span class="text-info" class="id">${data.id}</span></h6>
+                                <div class="form-group row">
+                                    <div class="col-8 form-inline row">
+                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="${data.phone}pin" type="password" placeholder="Enter PIN for Editing">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" onclick=myFunction('${data.phone}pin')>&nbsp;Show Password
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=editRez("${data.pin}","list${i + 1}${i + 1}","${data.phone}pin")>Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" id="list${i + 1}${i + 1}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Hot Restaurant</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>Name: <input value="${data.name}" id="${list}editName${i + 1}"></h6>
+                                <h6>Phone: <input value=${data.phone} id="${list}editPhone${i + 1}"></h6>
+                                <h6>Email: <input value=${data.email} id="${list}editEmail${i + 1}"></h6>
+                                <h6>Party Size: <input value=${data.id} id="${list}editID${i + 1}"></h6>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onclick = deleteRez({phone:"${data.phone}",email:"${data.email}",id:"${data.id}",code:"${data.code}"},'${list}')>Delete</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#${list}editName${i + 1}").val(),editPhone:$("#${list}editPhone${i + 1}").val(),editEmail:$("#${list}editEmail${i + 1}").val(),editID:$("#${list}editID${i + 1}").val(),editCode:${data.code}})>Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            function deleteRez(obj, list) {
+                if (list === "reservations") {
+                    $.ajax({
+                        url: 'api/reservations',
+                        type: 'DELETE',
+                        data: obj,
+                        success: alert(`${obj.code} was deleted!!!`)
+                    });
+                    refillRezWait();
+                } else {
+                    $.ajax({
+                        url: 'api/waitlist',
+                        type: 'DELETE',
+                        data: obj,
+                        success: alert(`${obj.code} was deleted!!!`)
+                    });
+                }
+            }
+
+
+            function refillRezWait() {
+                $.get("/api/reservations", function (data) {
+                    if (data.length < 5) {
+                        let start = data.length;
+                        $.get("/api/waitlist", function (res) {
+                            let waitlength = res.length;
+                            for (var i = start; i < 5 && waitlength > 0; i++ , waitlength--) {
+                                let currObj = res.shift();
+                                $.post("/api/reservations", currObj);
+                                $.ajax({
+                                    url: 'api/waitlist',
+                                    type: 'DELETE',
+                                    data: currObj,
+                                });
+                            }
+                            window.location.reload(true);
+                        });
+                    }
+                });
+            }
+
+            function phonenumber(inputtxt) {
+                var phoneNumberPattern = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+                if (phoneNumberPattern.test(inputtxt)) {
+                    return true;
+                }
+                else {
+                    alert("Please enter a valid phone number!");
+                    return false;
+                }
+            }
+
+            function validateEmail(mail) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (re.test(String(mail).toLowerCase())) return true;
+                else {
+                    alert("Please enter a valid email address!")
+                    return false;
+                }
+            }
+
+            function validateID(input) {
+                var re = /^\d+$/;
+                if (re.test(input)) return true;
+                else {
+                    alert("Please enter a number for party size!")
+                    return false;
+                }
+            }
+
 
         </script>
-
 </body>
 
 </html>

@@ -15,46 +15,82 @@ var waitlist = [];
 // Routes
 // =============================================================
 // Basic route that sends the user first to the AJAX Page
-app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname, "home.html"));
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-app.get("/reservation", function(req, res) {
+app.get("/reservation", function (req, res) {
   res.sendFile(path.join(__dirname, "reservation.html"));
 });
-app.get("/view", function(req, res) {
-    res.sendFile(path.join(__dirname, "view.html"));
-  });
+app.get("/view", function (req, res) {
+  res.sendFile(path.join(__dirname, "view.html"));
+});
 // Displays all characters
-app.get("/api/tables", function(req, res) {
+app.get("/api/reservations", function (req, res) {
   return res.json(reservations);
 });
 // Displays a single character, or returns false
-app.get("/api/waitlist", function(req, res) {
-    return res.json(waitlist);
+app.get("/api/waitlist", function (req, res) {
+  return res.json(waitlist);
 })
 // Create New Characters - takes in JSON input
-app.post("/api/tables", function(req, res) {
-  // req.body hosts is equal to the JSON post sent from the user
-  // This works because of our body parsing middleware
+app.post("/api/reservations", function (req, res) {
   var newReservation = req.body;
-  // Using a RegEx Pattern to remove spaces from newCharacter
-  // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-  //newCharacter.routeName = newCharacter.name.replace(/\s+/g, "").toLowerCase();
-  console.log(newReservation);
-  reservations.push(newReservation);
+  var index = -1;
+  for (var i = 0; i < reservations.length; i++) {
+    if (reservations[i].code === newReservation.code) {
+      index = i;
+      break;
+    }
+  }
+  if (index !== -1) {
+    reservations[index] = newReservation;
+  } else {
+    reservations.push(newReservation);
+  }
   res.json(newReservation);
 });
 
 app.post("/api/waitlist", function (req, res) {
   var newReservation = req.body;
-  console.log(newReservation);
-  console.log(waitlist);
-  waitlist.push(newReservation);
+  var index = -1;
+  for (var i = 0; i < waitlist.length; i++) {
+    if (waitlist[i].code === newReservation.code) {
+      index = i;
+      break;
+    }
+  }
+  if (index !== -1) {
+    waitlist[index] = newReservation;
+  } else {
+    waitlist.push(newReservation);
+  }
   res.json(newReservation);
+
 });
 
+app.delete("/api/reservations", function (req, res) {
+  var deleteReservation = req.body;
+  for (var i = 0; i < reservations.length; i++) {
+    if (reservations[i].code === deleteReservation.code) {
+      reservations.splice(i, 1);
+      break;
+    }
+  }
+  res.json(deleteReservation);
+});
+
+app.delete("/api/waitlist", function (req, res) {
+  var deletewaitlist = req.body;
+  for (var i = 0; i < waitlist.length; i++) {
+    if (waitlist[i].code === deletewaitlist.code) {
+      waitlist.splice(i, 1);
+      break;
+    }
+  }
+  res.json(deletewaitlist);
+});
 // Starts the server to begin listening
 // =============================================================
-app.listen(PORT, function() {
+app.listen(PORT, function () {
   console.log("App listening on PORT " + PORT);
 });
