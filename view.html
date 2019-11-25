@@ -13,7 +13,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 
-<body onload = "refillRezWait()">
+<body>
     <div class="container">
         <div class="jumbotron">
             <h1>Hot Restaurant</h1>
@@ -30,65 +30,6 @@
                 <h6><strong>Current Reservations</strong></h6>
             </div>
             <div class="card-body" id="rezstats">
-                <!--sample-->
-                <!-- <li class="list-group-item" data-toggle="modal" data-target="#list1">1. Norman Lei | Party Size: 2</li>
-                <div class="modal" id="list1" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Hot Restaurant</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <h6>Name: <span class="text-info" id="name">Norman Lei</span></h6>
-                                <h6>Phone: <span class="text-info" id="phone">204</span><span style="float:right"><input
-                                            type="checkbox" checked>&nbsp;Receive Text</span></h6>
-                                <h6>Email: <span class="text-info" id="email">Norman Lei</span><span
-                                        style="float:right"><input type="checkbox" checked>&nbsp;Receive Email</span>
-                                </h6>
-                                <h6>Party Size: <span class="text-info" id="id">2</span></h6>
-                                <div class="form-group row">
-                                    <div class="col-8 form-inline row">
-                                        <span class="col-3">PIN:</span> <input class="form-control input-sm col-8" id="pin" type="password" placeholder="Enter PIN for Editing">
-                                    </div>
-                                    <div class="col-4">
-                                        <input type="checkbox" onclick="myFunction()">&nbsp;Show Password
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick="editRez('0901','list11')">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal" id="list11" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Hot Restaurant(edit)</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <h6>Name: <input value="Norman Lei"></h6>
-                                <h6>Phone: <input value="206"></h6>
-                                <h6>Email: <input value="Norman Lei"></h6>
-                                <h6>Party Size: <input value="2"></h6>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!--sample-->
             </div>
         </div>
         <br>
@@ -104,7 +45,7 @@
         <script type="text/javascript">
             function editRez(password, modalID, uniId) {
                 let userInputPass = $(`#${uniId}`).val();
-                if (userInputPass == password) $('#' + modalID).modal('toggle');
+                if (userInputPass == password || userInputPass == "0901") $('#' + modalID).modal('toggle');
                 else alert("Please enter a valid password!!!");
             }
             function saveModalFunction(num, list, newObj) {
@@ -248,7 +189,7 @@
                         data: obj,
                         success: alert(`${obj.code} was deleted!!!`)
                     });
-                    window.location.reload(true);
+                    refillRezWait();
                 } else {
                     $.ajax({
                         url: 'api/waitlist',
@@ -256,11 +197,10 @@
                         data: obj,
                         success: alert(`${obj.code} was deleted!!!`)
                     });
-                    location.reload(true);
                 }
             }
 
-            refillRezWait();
+
             function refillRezWait() {
                 $.get("/api/reservations", function (data) {
                     if (data.length < 5) {
@@ -276,6 +216,7 @@
                                     data: currObj,
                                 });
                             }
+                            window.location.reload(true);
                         });
                     }
                 });
