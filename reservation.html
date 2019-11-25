@@ -72,6 +72,13 @@
     </div>
 
     <script type="text/javascript">
+        let usedNum = [];
+        function createRandomNum() {
+            let currNum = Math.floor(Math.random() * 999) + 1;
+            while (usedNum.indexOf(currNum) !== -1) createRandomNum();
+            usedNum.push(currNum);
+            return currNum;
+        }
         function myFunction() {
             var x = document.getElementById("reservation-pin");
             if (x.type === "password") {
@@ -90,6 +97,7 @@
                         email: $("#reservation-email").val(),
                         id: $("#reservation-id").val(),
                         pin: $("#reservation-pin").val(),
+                        code: createRandomNum(),
                     };
                     $("#reservation-name").val('');
                     $("#reservation-phone").val('');

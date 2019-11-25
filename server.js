@@ -15,38 +15,58 @@ var waitlist = [];
 // Routes
 // =============================================================
 // Basic route that sends the user first to the AJAX Page
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
-app.get("/reservation", function(req, res) {
+app.get("/reservation", function (req, res) {
   res.sendFile(path.join(__dirname, "reservation.html"));
 });
-app.get("/view", function(req, res) {
-    res.sendFile(path.join(__dirname, "view.html"));
-  });
+app.get("/view", function (req, res) {
+  res.sendFile(path.join(__dirname, "view.html"));
+});
 // Displays all characters
-app.get("/api/reservations", function(req, res) {
+app.get("/api/reservations", function (req, res) {
   return res.json(reservations);
 });
 // Displays a single character, or returns false
-app.get("/api/waitlist", function(req, res) {
-    return res.json(waitlist);
+app.get("/api/waitlist", function (req, res) {
+  return res.json(waitlist);
 })
 // Create New Characters - takes in JSON input
-app.post("/api/reservations", function(req, res) {
+app.post("/api/reservations", function (req, res) {
   var newReservation = req.body;
-  reservations.push(newReservation);
-  res.json(newReservation);
+  var index = -1;
+  for (var i = 0; i<reservations.length; i++){
+    if (reservations[i].code === newReservation.code){
+      index = i;
+      break;
+    }
+  }
+  if (index!==-1){
+    reservations[index] = newReservation;
+  }else {
+    reservations.push(newReservation);
+  }
 });
 
 app.post("/api/waitlist", function (req, res) {
   var newReservation = req.body;
-  waitlist.push(newReservation);
-  res.json(newReservation);
+  var index = -1;
+  for (var i = 0; i<waitlist.length; i++){
+    if (waitlist[i].code === newReservation.code){
+      index = i;
+      break;
+    }
+  }
+  if (index!==-1){
+    waitlist[index] = newReservation;
+  }else {
+    waitlist.push(newReservation);
+  }
 });
 
 // Starts the server to begin listening
 // =============================================================
-app.listen(PORT, function() {
+app.listen(PORT, function () {
   console.log("App listening on PORT " + PORT);
 });

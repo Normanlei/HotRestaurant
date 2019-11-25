@@ -102,7 +102,7 @@
         </div>
 
         <script type="text/javascript">
-            function editRez(password, modalID,uniId) {
+            function editRez(password, modalID, uniId) {
                 let userInputPass = $(`#${uniId}`).val();
                 if (userInputPass == password) $('#' + modalID).modal('toggle');
                 else alert("Please enter a valid password!!!");
@@ -116,13 +116,18 @@
                             currObj.phone = newObj.editPhone;
                             currObj.email = newObj.editEmail;
                             currObj.id = newObj.editID;
-                            let res = data;
+                            currObj.code = newObj.editCode;
                             $("#rezstats").empty();
-                            for (var i = 0; i < res.length; i++) {
-                                let currObj = res[i];
+                            for (var i = 0; i < data.length; i++) {
+                                let currObj = data[i];
                                 let currList = generateList(currObj, i, "reservations");
                                 $("#rezstats").append(currList);
                             }
+                            console.log(data);
+                            $.post("/api/reservations", currObj)
+                                .then(function () {
+                                    alert("API/RESERVATION IS UP TO DATA!!!");
+                                });
                         });
                     } else {
                         $.get("/api/waitlist", function (data) {
@@ -131,6 +136,7 @@
                             currObj.phone = newObj.editPhone;
                             currObj.email = newObj.editEmail;
                             currObj.id = newObj.editID;
+                            currObj.code = newObj.editCode;
                             let res = data;
                             $("#waitstats").empty();
                             for (var i = 0; i < res.length; i++) {
@@ -214,18 +220,57 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <h6>Name: <input value="${data.name}" id="${list}editName${i+1}"></h6>
-                                <h6>Phone: <input value=${data.phone} id="${list}editPhone${i+1}"></h6>
-                                <h6>Email: <input value=${data.email} id="${list}editEmail${i+1}"></h6>
-                                <h6>Party Size: <input value=${data.id} id="${list}editID${i+1}"></h6>
+                                <h6>Name: <input value="${data.name}" id="${list}editName${i + 1}"></h6>
+                                <h6>Phone: <input value=${data.phone} id="${list}editPhone${i + 1}"></h6>
+                                <h6>Email: <input value=${data.email} id="${list}editEmail${i + 1}"></h6>
+                                <h6>Party Size: <input value=${data.id} id="${list}editID${i + 1}"></h6>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#${list}editName${i+1}").val(),editPhone:$("#${list}editPhone${i+1}").val(),editEmail:$("#${list}editEmail${i+1}").val(),editID:$("#${list}editID${i+1}").val()})>Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onclick = deleteRez(${i},"${list}")>Delete</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#${list}editName${i + 1}").val(),editPhone:$("#${list}editPhone${i + 1}").val(),editEmail:$("#${list}editEmail${i + 1}").val(),editID:$("#${list}editID${i + 1}").val(),editCode:${data.code}})>Save</button>
                             </div>
                         </div>
                     </div>
                 </div>`;
+            }
+
+            function deleteRez(index, list) {
+                if (list === "reservations") {
+                    $.get("/api/reservations", function (data) {
+                        console.log(data);
+                        data.splice(index, 1);
+                        $.get("/api/reservations").responseJSON = data;
+                        $("#rezstats").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            let currObj = data[i];
+                            let currList = generateList(currObj, i, "reservations");
+                            $("#rezstats").append(currList);
+                        }
+                    });
+                } else {
+                    $.get("/api/waitlist", function (data) {
+                        console.log(data);
+                        data.splice(index, 1);
+                        $("#waitstats").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            let currObj = data[i];
+                            let currList = generateList(currObj, i, "waitlist");
+                            $("#waitstats").append(currList);
+                        }
+                    });
+                }
+            }
+
+            function refillRezWait() {
+                let reservationList = $.get("/api/reservations").responseJSON;
+                let waitList = $.get("/api/waitlist").responseJSON;
+                if (reservationList.length < 5 && waitList > 0) {
+                    let tempsize = reservationList.length;
+                    for (let i = tempsize; i < 5 && waitList.length > 0; i++) {
+                        reservationList.push(waitList.shift());
+                    }
+                }
+
             }
 
             function phonenumber(inputtxt) {
