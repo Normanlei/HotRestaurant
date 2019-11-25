@@ -36,35 +36,59 @@ app.get("/api/waitlist", function (req, res) {
 app.post("/api/reservations", function (req, res) {
   var newReservation = req.body;
   var index = -1;
-  for (var i = 0; i<reservations.length; i++){
-    if (reservations[i].code === newReservation.code){
+  for (var i = 0; i < reservations.length; i++) {
+    if (reservations[i].code === newReservation.code) {
       index = i;
       break;
     }
   }
-  if (index!==-1){
+  if (index !== -1) {
     reservations[index] = newReservation;
-  }else {
+  } else {
     reservations.push(newReservation);
   }
+  res.json(newReservation);
 });
 
 app.post("/api/waitlist", function (req, res) {
   var newReservation = req.body;
   var index = -1;
-  for (var i = 0; i<waitlist.length; i++){
-    if (waitlist[i].code === newReservation.code){
+  for (var i = 0; i < waitlist.length; i++) {
+    if (waitlist[i].code === newReservation.code) {
       index = i;
       break;
     }
   }
-  if (index!==-1){
+  if (index !== -1) {
     waitlist[index] = newReservation;
-  }else {
+  } else {
     waitlist.push(newReservation);
   }
+  res.json(newReservation);
+
 });
 
+app.delete("/api/reservations", function (req, res) {
+  var deleteReservation = req.body;
+  for (var i = 0; i < reservations.length; i++) {
+    if (reservations[i].code === deleteReservation.code) {
+      reservations.splice(i, 1);
+      break;
+    }
+  }
+  res.json(deleteReservation);
+});
+
+app.delete("/api/waitlist", function (req, res) {
+  var deletewaitlist = req.body;
+  for (var i = 0; i < waitlist.length; i++) {
+    if (waitlist[i].code === deletewaitlist.code) {
+      waitlist.splice(i, 1);
+      break;
+    }
+  }
+  res.json(deletewaitlist);
+});
 // Starts the server to begin listening
 // =============================================================
 app.listen(PORT, function () {

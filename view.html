@@ -13,7 +13,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 
-<body>
+<body onload = "refillRezWait()">
     <div class="container">
         <div class="jumbotron">
             <h1>Hot Restaurant</h1>
@@ -144,6 +144,10 @@
                                 let currList = generateList(currObj, i, "waitlist");
                                 $("#waitstats").append(currList);
                             }
+                            $.post("/api/waitlist", currObj)
+                                .then(function () {
+                                    alert("API/waitlist IS UP TO DATA!!!");
+                                });
                         });
                     }
                 }
@@ -157,6 +161,7 @@
                 }
             }
             $.get("/api/reservations", function (data) {
+                $("#rezstats").html("");
                 if (data.length > 0) {
                     for (var i = 0; i < data.length; i++) {
                         let currObj = data[i];
@@ -167,6 +172,7 @@
             });
 
             $.get("/api/waitlist", function (data) {
+                $("#waitstats").html("");
                 if (data.length > 0) {
                     for (var i = 0; i < data.length; i++) {
                         let currObj = data[i];
@@ -226,7 +232,7 @@
                                 <h6>Party Size: <input value=${data.id} id="${list}editID${i + 1}"></h6>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onclick = deleteRez(${i},"${list}")>Delete</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close" onclick = deleteRez({phone:"${data.phone}",email:"${data.email}",id:"${data.id}",code:"${data.code}"},'${list}')>Delete</button>
                                 <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" onclick=saveModalFunction(${i},"${list}",{editName:$("#${list}editName${i + 1}").val(),editPhone:$("#${list}editPhone${i + 1}").val(),editEmail:$("#${list}editEmail${i + 1}").val(),editID:$("#${list}editID${i + 1}").val(),editCode:${data.code}})>Save</button>
                             </div>
                         </div>
@@ -234,43 +240,45 @@
                 </div>`;
             }
 
-            function deleteRez(index, list) {
+            function deleteRez(obj, list) {
                 if (list === "reservations") {
-                    $.get("/api/reservations", function (data) {
-                        console.log(data);
-                        data.splice(index, 1);
-                        $.get("/api/reservations").responseJSON = data;
-                        $("#rezstats").empty();
-                        for (var i = 0; i < data.length; i++) {
-                            let currObj = data[i];
-                            let currList = generateList(currObj, i, "reservations");
-                            $("#rezstats").append(currList);
-                        }
+                    $.ajax({
+                        url: 'api/reservations',
+                        type: 'DELETE',
+                        data: obj,
+                        success: alert(`${obj.code} was deleted!!!`)
                     });
+                    window.location.reload(true);
                 } else {
-                    $.get("/api/waitlist", function (data) {
-                        console.log(data);
-                        data.splice(index, 1);
-                        $("#waitstats").empty();
-                        for (var i = 0; i < data.length; i++) {
-                            let currObj = data[i];
-                            let currList = generateList(currObj, i, "waitlist");
-                            $("#waitstats").append(currList);
-                        }
+                    $.ajax({
+                        url: 'api/waitlist',
+                        type: 'DELETE',
+                        data: obj,
+                        success: alert(`${obj.code} was deleted!!!`)
                     });
+                    location.reload(true);
                 }
             }
 
+            refillRezWait();
             function refillRezWait() {
-                let reservationList = $.get("/api/reservations").responseJSON;
-                let waitList = $.get("/api/waitlist").responseJSON;
-                if (reservationList.length < 5 && waitList > 0) {
-                    let tempsize = reservationList.length;
-                    for (let i = tempsize; i < 5 && waitList.length > 0; i++) {
-                        reservationList.push(waitList.shift());
+                $.get("/api/reservations", function (data) {
+                    if (data.length < 5) {
+                        let start = data.length;
+                        $.get("/api/waitlist", function (res) {
+                            let waitlength = res.length;
+                            for (var i = start; i < 5 && waitlength > 0; i++ , waitlength--) {
+                                let currObj = res.shift();
+                                $.post("/api/reservations", currObj);
+                                $.ajax({
+                                    url: 'api/waitlist',
+                                    type: 'DELETE',
+                                    data: currObj,
+                                });
+                            }
+                        });
                     }
-                }
-
+                });
             }
 
             function phonenumber(inputtxt) {
@@ -304,7 +312,6 @@
 
 
         </script>
-
 </body>
 
 </html>
